@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset="utf-8">
+    <title>Cat Detector</title>
+    <style></style>
+    <script src="jquery-3.4.1.min.js"></script>
+    <script>
+      $(document).ready(
+	  function() {
+
+	      $.ajax({
+		  type: 'GET',
+		  url: '/switch/west',
+		  success: function(response) {
+		      if (response.status != "ok") {
+			  alert("Error while getting the current state of the switch west");
+			  return
+		      }
+		      if (response.state == "on") {
+			  $("#weston").css('background-color', 'lightblue');
+		      } else {
+			  $("#westoff").css('background-color', 'lightblue');
+		      }
+		  },
+	      });
+
+	      $.ajax({
+		  type: 'GET',
+		  url: '/switch/south',
+		  success: function(response) {
+		      if (response.status != "ok") {
+			  alert("Error while getting the current state of the switch south");
+			  return
+		      }
+		      if (response.state == "on") {
+			  $("#southon").css('background-color', 'lightblue');
+		      } else {
+			  $("#southoff").css('background-color', 'lightblue');
+		      }
+		  },
+	      });
+
+	      $("#westdetection").on("change", function() {
+		  $.ajax({
+		      type: 'PUT',
+		      url: '/switch/west',
+		      data: JSON.stringify({"detection":$("#westdetection").children("option:selected").val()}),
+		      success: function(response) {
+			  if (response.status != "ok") {
+			      alert("Error while getting activating/deactivating detection on switch west");
+			      return
+			  }
+		      },
+		      contentType: "application/json",
+		      dataType: 'json'
+		  });
+	      });
+
+	      $("#weston").on("click", function() {
+		  $.ajax({
+		      type: 'PUT',
+		      url: '/switch/west',
+		      data: JSON.stringify({"state":"on",
+					    "duration":$("input#westduration").val()}),
+		      success: function(response) {
+			  $("#weston").css('background-color', 'lightblue');
+			  $("#westoff").css('background-color', 'white');
+		      },
+		      contentType: "application/json",
+		      dataType: 'json'
+		  });
+	      });
+
+	      $("#westoff").on("click", function() {
+		  $.ajax({
+		      type: 'PUT',
+		      url: '/switch/west',
+		      data: '{"state":"off"}',
+		      success: function(response) {
+			  $("#westoff").css('background-color', 'lightblue');
+			  $("#weston").css('background-color', 'white');
+		      },
+		      contentType: "application/json",
+		      dataType: 'json'
+		  });
+	      });
+
+	      $("#southdetection").on("change", function() {
+		  $.ajax({
+		      type: 'PUT',
+		      url: '/switch/south',
+		      data: JSON.stringify({"detection":$("#southdetection").children("option:selected").val()}),
+		      success: function(response) {
+			  if (response.status != "ok") {
+			      alert("Error while getting activating/deactivating detection on switch south");
+			      return
+			  }
+		      },
+		      contentType: "application/json",
+		      dataType: 'json'
+		  });
+	      });
+
+	      $("#southon").on("click", function() {
+		  $.ajax({
+		      type: 'PUT',
+		      url: '/switch/south',
+		      data: JSON.stringify({"state":"on",
+					    "duration":$("input#southduration").val()}),
+		      success: function(response) {
+			  $("#southon").css('background-color', 'lightblue');
+			  $("#southoff").css('background-color', 'white');
+		      },
+		      contentType: "application/json",
+		      dataType: 'json'
+		  });
+	      });
+
+	      $("#southoff").on("click", function() {
+		  $.ajax({
+		      type: 'PUT',
+		      url: '/switch/south',
+		      data: '{"state":"off"}',
+		      success: function(response) {
+			  $("#southoff").css('background-color', 'lightblue');
+			  $("#southon").css('background-color', 'white');
+		      },
+		      contentType: "application/json",
+		      dataType: 'json'
+		  });
+	      });
+
+	  }
+      )
+    </script>
+  </head>
+
+  <body>
+
+    <h1>Cat Detector</h1>
+
+
+    <div id="west" class="switch">
+      <b>Switch West:</b>
+
+      <form>
+	Detection:
+	<button class="detection">Off</button>
+	</select>
+      </form>
+
+      <form>
+	Activation:
+	<button class="activation">Off</button>
+	<input class="duration" name="duration" type="text" value="60" size="3">seconds
+      </form>
+    </div>
+
+
+    <div id="south" class="switch">
+      <b>Switch South:</b>
+
+      <form>
+	Detection:
+	<button class="detection">Off</button>
+	</select>
+      </form>
+
+      <form>
+	Activation:
+	<button class="activation">Off</button>
+	<input class="duration" name="duration" type="text" value="60" size="3">seconds
+      </form>
+    </div>
+
+
+  </body>
+</html>
