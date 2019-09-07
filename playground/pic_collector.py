@@ -5,6 +5,7 @@ Small script to take pictures on a regular basis.
 """
 
 import asyncio
+import datetime
 
 from picamera import PiCamera
 from time import sleep
@@ -18,20 +19,22 @@ FOLDER = "/home/pi/Pictures"
 
 async def take_pic():
 
-    while True:
-        for i in range(5):
+    for j in range(1000):
 
-            time = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-            fname = f"img_{i}_{time}.jpg"
+        camera.start_preview()
+        await asyncio.sleep(5)
+
+        for i in range(3):
+
+            time = datetime.datetime.now().strftime("%y%m%d_%H%M%S")
+            fname = f"img_{time}_{i}.jpg"
             fpath = join(FOLDER, fname)
-
-            camera.start_preview()
-            #sleep(5)
-            asyncio.sleep(5)
             camera.capture(fpath)
-            camera.stop_preview()
+            await asyncio.sleep(2)
 
-        asyncio.sleep(5*60)
+        camera.stop_preview()
+
+        await asyncio.sleep(10*60)
 
 loop = asyncio.get_event_loop()
-loop.run(take_pic())
+loop.run_until_complete(take_pic())
