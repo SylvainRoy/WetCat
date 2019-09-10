@@ -7,134 +7,162 @@
     <style></style>
     <script src="jquery-3.4.1.min.js"></script>
     <script>
-      $(document).ready(
+      $('document').ready(
 	  function() {
 
-	      $.ajax({
-		  type: 'GET',
-		  url: '/switch/west',
-		  success: function(response) {
-		      if (response.status != "ok") {
-			  alert("Error while getting the current state of the switch west");
-			  return
-		      }
-		      if (response.state == "on") {
-			  $("#weston").css('background-color', 'lightblue');
-		      } else {
-			  $("#westoff").css('background-color', 'lightblue');
-		      }
-		  },
+	      // Set up the websocket with the server
+	      var socket = new WebSocket('ws://localhost:8080/ws');
+	      socket.onopen = function(e) {
+		  console.log("Websocket opened.");
+		  socket.send(JSON.stringify({"action":"status", "switch":"west"}))
+		  socket.send(JSON.stringify({"action":"status", "switch":"south"}))
+	      };
+	      socket.onmessage = function(msg) {
+		  console.log("Websocket received: " + msg.data);
+		  //todo: decode that and update checkbox accordingly.
+		  //recv: {"switch": "west", "state": false, "detection": true, "duration": 0}
+		  recv = JSON.parse(msg.data);
+		  var switch_ = recv.switch;
+		  var state = recv.state;
+		  var detection = recv.detection;
+		  var duration = recv.duration;
+
+		  // Works OK:
+		  $('#' + switch_).find('.state').find('.duration').val(duration);
+
+		  // todo: Doesn't work:
+		  $('#' + switch_).find('.state').find('.selector').checked = state;
+		  $('#' + switch_).find('.detection').find('.selector').checked = detection;
+
+
+	      };
+	      socket.onclose = function() {
+		  console.log("Websocket closed.");
+	      };
+	      socket.onerror = function(error) {
+		  console.log("Websocket error: " + error);
+	      };
+
+	      // Callback for checkbox state change.
+	      $('.selector').on("change", function (){
+		  var value = this.checked;
+		  var setting = this.parentNode.className;
+		  var switch_ = this.parentNode.parentNode.id;
+		  var duration = parseInt($('#' + switch_).find('.' + setting).find('.duration').val());
+		  console.log("Change detected: " + switch_ + "=>" + setting + ":" + value + "/" + duration);
+		  var msg = {"action":"change", "switch":switch_, "duration":duration};
+		  msg[setting] = value;
+		  jsonmsg = JSON.stringify(msg);
+		  console.log("Websocket send: " + jsonmsg);
+		  socket.send(jsonmsg);
 	      });
 
-	      $.ajax({
-		  type: 'GET',
-		  url: '/switch/south',
-		  success: function(response) {
-		      if (response.status != "ok") {
-			  alert("Error while getting the current state of the switch south");
-			  return
-		      }
-		      if (response.state == "on") {
-			  $("#southon").css('background-color', 'lightblue');
-		      } else {
-			  $("#southoff").css('background-color', 'lightblue');
-		      }
-		  },
-	      });
-
-	      $("#westdetection").on("change", function() {
-		  $.ajax({
-		      type: 'PUT',
-		      url: '/switch/west',
-		      data: JSON.stringify({"detection":$("#westdetection").children("option:selected").val()}),
-		      success: function(response) {
-			  if (response.status != "ok") {
-			      alert("Error while getting activating/deactivating detection on switch west");
-			      return
-			  }
-		      },
-		      contentType: "application/json",
-		      dataType: 'json'
-		  });
-	      });
-
-	      $("#weston").on("click", function() {
-		  $.ajax({
-		      type: 'PUT',
-		      url: '/switch/west',
-		      data: JSON.stringify({"state":"on",
-					    "duration":$("input#westduration").val()}),
-		      success: function(response) {
-			  $("#weston").css('background-color', 'lightblue');
-			  $("#westoff").css('background-color', 'white');
-		      },
-		      contentType: "application/json",
-		      dataType: 'json'
-		  });
-	      });
-
-	      $("#westoff").on("click", function() {
-		  $.ajax({
-		      type: 'PUT',
-		      url: '/switch/west',
-		      data: '{"state":"off"}',
-		      success: function(response) {
-			  $("#westoff").css('background-color', 'lightblue');
-			  $("#weston").css('background-color', 'white');
-		      },
-		      contentType: "application/json",
-		      dataType: 'json'
-		  });
-	      });
-
-	      $("#southdetection").on("change", function() {
-		  $.ajax({
-		      type: 'PUT',
-		      url: '/switch/south',
-		      data: JSON.stringify({"detection":$("#southdetection").children("option:selected").val()}),
-		      success: function(response) {
-			  if (response.status != "ok") {
-			      alert("Error while getting activating/deactivating detection on switch south");
-			      return
-			  }
-		      },
-		      contentType: "application/json",
-		      dataType: 'json'
-		  });
-	      });
-
-	      $("#southon").on("click", function() {
-		  $.ajax({
-		      type: 'PUT',
-		      url: '/switch/south',
-		      data: JSON.stringify({"state":"on",
-					    "duration":$("input#southduration").val()}),
-		      success: function(response) {
-			  $("#southon").css('background-color', 'lightblue');
-			  $("#southoff").css('background-color', 'white');
-		      },
-		      contentType: "application/json",
-		      dataType: 'json'
-		  });
-	      });
-
-	      $("#southoff").on("click", function() {
-		  $.ajax({
-		      type: 'PUT',
-		      url: '/switch/south',
-		      data: '{"state":"off"}',
-		      success: function(response) {
-			  $("#southoff").css('background-color', 'lightblue');
-			  $("#southon").css('background-color', 'white');
-		      },
-		      contentType: "application/json",
-		      dataType: 'json'
-		  });
-	      });
-
-	  }
-      )
+	  })
     </script>
+    <style>
+
+      input[type="checkbox"].ios8-switch {
+	  position: absolute;
+	  margin: 8px 0 0 16px;
+      }
+      input[type="checkbox"].ios8-switch + label {
+	  position: relative;
+	  padding: 5px 0 0 50px;
+	  line-height: 2.0em;
+      }
+      input[type="checkbox"].ios8-switch + label:before {
+	  content: "";
+	  position: absolute;
+	  display: block;
+	  left: 0;
+	  top: 0;
+	  width: 40px; /* x*5 */
+	  height: 24px; /* x*3 */
+	  border-radius: 16px; /* x*2 */
+	  background: #fff;
+	  border: 1px solid #d9d9d9;
+	  -webkit-transition: all 0.3s;
+	  transition: all 0.3s;
+      }
+      input[type="checkbox"].ios8-switch + label:after {
+	  content: "";
+	  position: absolute;
+	  display: block;
+	  left: 0px;
+	  top: 0px;
+	  width: 24px; /* x*3 */
+	  height: 24px; /* x*3 */
+	  border-radius: 16px; /* x*2 */
+	  background: #fff;
+	  border: 1px solid #d9d9d9;
+	  -webkit-transition: all 0.3s;
+	  transition: all 0.3s;
+      }
+      input[type="checkbox"].ios8-switch + label:hover:after {
+	  box-shadow: 0 0 5px rgba(0,0,0,0.3);
+      }
+      input[type="checkbox"].ios8-switch:checked + label:after {
+	  margin-left: 16px;
+      }
+      input[type="checkbox"].ios8-switch:checked + label:before {
+	  background: #55D069;
+      }
+
+      /* SMALL */
+
+      input[type="checkbox"].ios8-switch-sm {
+	  margin: 5px 0 0 10px;
+      }
+      input[type="checkbox"].ios8-switch-sm + label {
+	  position: relative;
+	  padding: 0 0 0 32px;
+	  line-height: 1.3em;
+      }
+      input[type="checkbox"].ios8-switch-sm + label:before {
+	  width: 25px; /* x*5 */
+	  height: 15px; /* x*3 */
+	  border-radius: 10px; /* x*2 */
+      }
+      input[type="checkbox"].ios8-switch-sm + label:after {
+	  width: 15px; /* x*3 */
+	  height: 15px; /* x*3 */
+	  border-radius: 10px; /* x*2 */
+      }
+      input[type="checkbox"].ios8-switch-sm + label:hover:after {
+	  box-shadow: 0 0 3px rgba(0,0,0,0.3);
+      }
+      input[type="checkbox"].ios8-switch-sm:checked + label:after {
+	  margin-left: 10px; /* x*2 */
+      }
+
+      /* LARGE */
+
+      input[type="checkbox"].ios8-switch-lg {
+	  margin: 10px 0 0 20px;
+      }
+      input[type="checkbox"].ios8-switch-lg + label {
+	  position: relative;
+	  padding: 7px 0 0 60px;
+	  line-height: 2.3em;
+      }
+      input[type="checkbox"].ios8-switch-lg + label:before {
+	  width: 50px; /* x*5 */
+	  height: 30px; /* x*3 */
+	  border-radius: 20px; /* x*2 */
+      }
+      input[type="checkbox"].ios8-switch-lg + label:after {
+	  width: 30px; /* x*3 */
+	  height: 30px; /* x*3 */
+	  border-radius: 20px; /* x*2 */
+      }
+      input[type="checkbox"].ios8-switch-lg + label:hover:after {
+	  box-shadow: 0 0 8px rgba(0,0,0,0.3);
+      }
+      input[type="checkbox"].ios8-switch-lg:checked + label:after {
+	  margin-left: 20px; /* x*2 */
+      }
+
+    </style>
   </head>
 
   <body>
@@ -143,38 +171,30 @@
 
 
     <div id="west" class="switch">
-      <b>Switch West:</b>
-
-      <form>
-	Detection:
-	<button class="detection">Off</button>
-	</select>
-      </form>
-
-      <form>
-	Activation:
-	<button class="activation">Off</button>
-	<input class="duration" name="duration" type="text" value="60" size="3">seconds
-      </form>
+      <h3>Switch West:</h3>
+      <div class="state">
+	<input type='checkbox' class='selector ios8-switch ios8-switch-lg' id='checkbox-west-state'>
+	<label for='checkbox-west-state'>On/Off (timer:</label>
+	<input class="duration" name="duration" type="text" value="6" size="3">seconds)
+      </div>
+      <div class="detection">
+	<input type='checkbox' class='selector ios8-switch ios8-switch-lg' id='checkbox-west-detection'>
+	<label for='checkbox-west-detection'>Cat Detection</label>
+      </div>
     </div>
-
 
     <div id="south" class="switch">
-      <b>Switch South:</b>
-
-      <form>
-	Detection:
-	<button class="detection">Off</button>
-	</select>
-      </form>
-
-      <form>
-	Activation:
-	<button class="activation">Off</button>
-	<input class="duration" name="duration" type="text" value="60" size="3">seconds
-      </form>
+      <h3>Switch South:</h3>
+      <div class="state">
+	<input type='checkbox' class='selector ios8-switch ios8-switch-lg' id='checkbox-south-state'>
+	<label for='checkbox-south-state'>On/Off (timer:</label>
+	<input class="duration" name="duration" type="text" value="6" size="3">seconds)
+      </div>
+      <div class="detection">
+	<input type='checkbox' class='selector ios8-switch ios8-switch-lg' id='checkbox-south-detection'>
+	<label for='checkbox-south-detection'>Cat Detection</label>
+      </div>
     </div>
-
 
   </body>
 </html>
