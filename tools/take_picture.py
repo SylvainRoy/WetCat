@@ -10,9 +10,10 @@ from datetime import datetime
 from picamera import PiCamera
 from time import sleep
 
-picfile = "picture" + datetime.now().strftime("%y%m%d_%H%M%S") + ".jpg"
-if len(sys.argv) > 0:
-    picfile = sys.argv[0]
+date = datetime.now().strftime("%y%m%d_%H%M%S")
+picfile = f"picture_{date}.jpg"
+if len(sys.argv) > 1:
+    picfile = sys.argv[1]
 
 camera = PiCamera()
 camera.rotation = 180

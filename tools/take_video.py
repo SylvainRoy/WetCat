@@ -10,9 +10,10 @@ from datetime import datetime
 from picamera import PiCamera
 from time import sleep
 
-movfile = "video" + datetime.now().strftime("%y%m%d_%H%M%S") + ".h264"
-if len(sys.argv) > 0:
-    movfile = sys.argv[0]
+date = datetime.now().strftime("%y%m%d_%H%M%S")
+movfile = f"video_{date}.h264"
+if len(sys.argv) > 1:
+    movfile = sys.argv[1]
 
 camera = PiCamera()
 camera.rotation = 180
