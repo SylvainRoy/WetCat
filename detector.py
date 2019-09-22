@@ -247,8 +247,9 @@ app.add_routes([web.get('/', get_help),
                 web.get('/switch/', get_switch),
                 web.get('/switch/{switch}', get_switch),
                 web.put('/switch/{switch}', put_switch),
-                web.static('/', './static'),
-                web.get('/ws', websocket_handler)])
+                web.get('/ws', websocket_handler),
+                web.static('/', './static')
+])
 
 
 #
