@@ -178,11 +178,6 @@ async def put_switch(request):
         return web.json_response({"status": "error",
                                   "message": "Switch detection must be a boolean."})
     if duration is not None:
-        #try:
-        #    duration = duration
-        #except ValueError:
-        #    return web.json_response({"status": "error",
-        #                              "message": "Duration must be an integer value."})
         if not (0 <= duration <= 600):
             return web.json_response({"status": "error",
                                       "message": "Duration cannot exceed 600 seconds."})
