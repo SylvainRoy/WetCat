@@ -35,19 +35,17 @@ class Switch:
         Set the state of the switch.
         """
         previous_state = self.state
-        if duration is not None:
-            self.timeoff = datetime.now() + timedelta(seconds=duration)
         if state is not None:
             self.state = state
         if detection is not None:
             self.detection = detection
-        # Publish new state
-        await self.publish_state()
-        # Activate/deactivate the switch if needed
-        if not(previous_state) and self.state:
-            await self._turn_on()
-        elif previous_state and not(self.state):
+        if not(self.state):
             self.timeoff = None
+        elif duration is not None:
+            self.timeoff = datetime.now() + timedelta(seconds=duration)
+        # Activate the switch if needed
+        if not(previous_state) and self.state:
+            await self._activate()
         # Publish new state
         await self.publish_state()
 
@@ -60,24 +58,38 @@ class Switch:
         if not(self.state) and self.detection:
             await self.set(state=True, duration=SPIKE)
 
-    async def _turn_on(self):
+    async def _activate(self):
         """
-        Activate the remote switch until timeoff.
+        Activate the remote switch.
         Do not use directly: self.set() ensure consistency between the state of the
         object and the remote switch.
         """
-        logging.debug(f"Switch {self.name} turned on until {self.timeoff}.")
         # todo: remotely activate the switch
-        while self.state:
-            if self.timeoff is None or self.timeoff <= datetime.now():
-                logging.debug(f"Switch {self.name}, time to stop.")
-                break
-            await self.publish_state()
-            await asyncio.sleep(1)
-        self.timeoff = None
-        self.state = False
+        logging.debug(f"Switch {self.name} turned on until {self.timeoff}.")
+
+    async def _deactivate(self):
+        """
+        Deactivate the remote switch.
+        Do not use directly: self.set() ensure consistency between the state of the
+        object and the remote switch.
+        """
         # todo: remotely deactivate the switch
         logging.debug(f"Switch {self.name} turned off.")
+
+    async def watchman(self):
+        """
+        Callback to continuously monitor the state of the switch and turn it off when needed.
+        """
+        logging.debug(f"Switch {self.name}: starting watchman.")
+        while True:
+            if self.state:
+                if (self.timeoff is None) or (self.timeoff <= datetime.now()):
+                    logging.debug(f"Switch {self.name}: time to stop.")
+                    await self._deactivate()
+                    self.timeoff = None
+                    self.state = False
+                await self.publish_state()
+            await asyncio.sleep(1)
 
     def duration(self):
         """Return the duration in second until switch is turn off."""
@@ -279,6 +291,12 @@ loop = asyncio.get_event_loop()
 EXECUTOR = ThreadPoolExecutor(1)
 loop.set_default_executor(EXECUTOR)
 
+# Set up a backgroup task to detect cats.
 loop.create_task(detection_manager())
 
+# Set up background tasks to turn off the switches.
+for switch_name, switch in Switches.items():
+    loop.create_task(switch.watchman())
+
+# Run the web server and the various background tasks.
 web.run_app(app)
