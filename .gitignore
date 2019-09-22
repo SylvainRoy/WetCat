@@ -105,3 +105,7 @@ venv.bak/
 
 # apple
 .DS_Store
+
+# emacs
+*~
+
