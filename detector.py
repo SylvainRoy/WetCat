@@ -23,6 +23,9 @@ SPIKE = 8    # Duration of a spike of water.
 #
 
 class Switch:
+    """
+    Controler of the state of a switch.
+    """
 
     def __init__(self, name):
         self.name = name
@@ -123,9 +126,10 @@ Switches = {
 # Web app
 #
 
-async def get_help(request):
-    text = f"This is the help... It could be improved! :-)\n"
-    return web.Response(text=text)
+async def get_app(request):
+#    with open("./static/index.html") as f:
+#        content = f.read()
+    return web.FileResponse(path="./static/index.html")
 
 
 async def get_switch(request):
@@ -243,7 +247,7 @@ async def websocket_handler(request):
 
 
 app = web.Application()
-app.add_routes([web.get('/', get_help),
+app.add_routes([web.get('/', get_app),
                 web.get('/switch/', get_switch),
                 web.get('/switch/{switch}', get_switch),
                 web.put('/switch/{switch}', put_switch),
