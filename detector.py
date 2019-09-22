@@ -14,8 +14,8 @@ from aiohttp import web, WSMsgType
 # Config
 #
 
-PERIOD = 100   # Delay between two measures.
-SPIKE = 3    # Duration of a spike of water.
+PERIOD = 3   # Delay between two measures.
+SPIKE = 8    # Duration of a spike of water.
 
 
 #
@@ -69,11 +69,10 @@ class Switch:
         logging.debug(f"Switch {self.name} turned on until {self.timeoff}.")
         # todo: remotely activate the switch
         while self.state:
-            logging.debug(f"Switch {self.name} waking up to check time (timeff is {self.timeoff}).")
             if self.timeoff is None or self.timeoff <= datetime.now():
                 logging.debug(f"Switch {self.name}, time to stop.")
                 break
-            logging.debug(f"Switch {self.name}, going back to sleep.")
+            await self.publish_state()
             await asyncio.sleep(1)
         self.timeoff = None
         self.state = False
@@ -213,6 +212,9 @@ async def websocket_handler(request):
                 # Change the state of the switch
                 await Switches[switch].set(**param)
 
+            else:
+                logging.error("Websocket unhandled action! {}".format(msg.type))
+
         elif msg.type == WSMsgType.ERROR:
             logging.debug("Websocket closed with exception {}".format(ws.exception()))
             break
@@ -220,7 +222,7 @@ async def websocket_handler(request):
         else:
             logging.error("Websocket unhandled event! {}".format(msg.type))
 
-        logging.error("Websocket end of handling of event: {}".format(msg.type))
+        logging.debug("Websocket end of handling of event: {}".format(msg.type))
 
 
     logging.debug("Websocket closed {}.".format(msg.type))
@@ -248,7 +250,8 @@ def detection():
     # todo: make this the real thing!
     # Simulate a lengthy processing and a possible cat detection.
     time.sleep(3)
-    region = ["west", "south", None][random.randint(0, 2)]
+    regions = ["west", "south", None]
+    region = regions[random.randint(0, 2)]
     return region
 
 

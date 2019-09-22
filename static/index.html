@@ -3,7 +3,7 @@
 
   <head>
     <meta charset="utf-8">
-    <title>Cat Detector</title>
+    <title>WetCat</title>
     <style></style>
     <script src="jquery-3.4.1.min.js"></script>
     <script>
@@ -19,21 +19,17 @@
 	      };
 	      socket.onmessage = function(msg) {
 		  console.log("Websocket received: " + msg.data);
-		  //todo: decode that and update checkbox accordingly.
-		  //recv: {"switch": "west", "state": false, "detection": true, "duration": 0}
 		  recv = JSON.parse(msg.data);
 		  var switch_ = recv.switch;
 		  var state = recv.state;
 		  var detection = recv.detection;
 		  var duration = recv.duration;
-
-		  // Works OK:
+		  $('#' + switch_).find('.state').find('.selector')[0].checked = state;
+		  $('#' + switch_).find('.detection').find('.selector')[0].checked = detection;
+		  if(!state) {
+		      duration = 60;
+		  }
 		  $('#' + switch_).find('.state').find('.duration').val(duration);
-
-		  // todo: Doesn't work:
-		  $('#' + switch_).find('.state').find('.selector').checked = state;
-		  $('#' + switch_).find('.detection').find('.selector').checked = detection;
-
 
 	      };
 	      socket.onclose = function() {
@@ -167,7 +163,7 @@
 
   <body>
 
-    <h1>Cat Detector</h1>
+    <h1>WetCat</h1>
 
 
     <div id="west" class="switch">
