@@ -12,20 +12,16 @@ from time import sleep
 from os.path import join
 
 
-camera = PiCamera()
-camera.rotation = 180
-
 FOLDER = "/home/pi/Pictures"
 
-async def take_pic():
+
+async def take_pic(camera):
 
     for j in range(1000):
-
         camera.start_preview()
         await asyncio.sleep(5)
 
         for i in range(3):
-
             time = datetime.datetime.now().strftime("%y%m%d_%H%M%S")
             fname = f"img_{time}_{i}.jpg"
             fpath = join(FOLDER, fname)
@@ -33,8 +29,10 @@ async def take_pic():
             await asyncio.sleep(2)
 
         camera.stop_preview()
-
         await asyncio.sleep(10*60)
 
-loop = asyncio.get_event_loop()
-loop.run_until_complete(take_pic())
+
+with PiCamera() as camera:
+    camera.rotation = 180
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(take_pic(camera))

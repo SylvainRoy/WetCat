@@ -15,13 +15,13 @@ picfile = f"picture_{date}.jpg"
 if len(sys.argv) > 1:
     picfile = sys.argv[1]
 
-camera = PiCamera()
-camera.rotation = 180
+with PiCamera() as camera:
+    camera.rotation = 180
 
-# Take picture
-camera.start_preview()
-sleep(5)
-camera.capture(picfile)
-camera.stop_preview()
+    # Take picture
+    camera.start_preview()
+    sleep(2)
+    camera.capture(picfile)
+    camera.stop_preview()
 
 print(f"Picture saved in {picfile}")

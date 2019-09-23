@@ -15,13 +15,14 @@ movfile = f"video_{date}.h264"
 if len(sys.argv) > 1:
     movfile = sys.argv[1]
 
-camera = PiCamera()
-camera.rotation = 180
+with PiCamera() as camera:
+    camera.rotation = 180
 
-camera.start_preview()
-camera.start_recording(movfile)
-sleep(15)
-camera.stop_recording()
-camera.stop_preview()
+    # Take video
+    camera.start_preview()
+    camera.start_recording(movfile)
+    sleep(15)
+    camera.stop_recording()
+    camera.stop_preview()
 
 print(f"Video saved in {movfile}")
