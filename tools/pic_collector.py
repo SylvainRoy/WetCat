@@ -1,38 +1,44 @@
 #!/usr/bin/env python3
 
 """
-Small script to take pictures on a regular basis.
+Small script to take small burst of pictures on a regular basis over a long period of time.
 """
 
 import asyncio
 import datetime
+import typer
 
 from picamera import PiCamera
 from time import sleep
 from os.path import join
 
 
-FOLDER = "/home/pi/Pictures"
+async def take_pic(camera, out, cycles, burst, delay, prefix, warmup):
 
+    for j in range(cycles):
 
-async def take_pic(camera):
-
-    for j in range(1000):
         camera.start_preview()
-        await asyncio.sleep(5)
+        await asyncio.sleep(warmup)
 
-        for i in range(3):
+        for i in range(burst):
             time = datetime.datetime.now().strftime("%y%m%d_%H%M%S")
-            fname = f"img_{time}_{i}.jpg"
-            fpath = join(FOLDER, fname)
+            fname = f"{prefix}{time}_{i}.jpg"
+            fpath = join(out, fname)
             camera.capture(fpath)
-            await asyncio.sleep(2)
+            await asyncio.sleep(1)
 
         camera.stop_preview()
-        await asyncio.sleep(10*60)
+        await asyncio.sleep(delay)
 
 
-with PiCamera() as camera:
-    camera.rotation = 180
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(take_pic(camera))
+def main(out: str = ".", cycles: int = 144, burst: int = 3, delay: int = 600, prefix: str = "img_", warmup: int = 3):
+
+    with PiCamera() as camera:
+        camera.rotation = 180
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(take_pic(camera, out, cycles, burst, delay, prefix, warmup))
+
+        
+if __name__ == "__main__":
+    typer.run(main)
+    

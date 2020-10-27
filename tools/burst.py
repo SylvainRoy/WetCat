@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 """
-Small script to take a burst of picture.
+Small script to take a burst of pictures.
 """
 
 
