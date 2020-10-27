@@ -4,30 +4,39 @@
 Small script to take a burst of picture.
 """
 
+
 import asyncio
 import datetime
+import typer
 
 from picamera import PiCamera
 from time import sleep
 from os.path import join
 
 
-camera = PiCamera()
-camera.rotation = 180
+def main(num: int = 5, out: str  = ".", rotation: int = 180, warmup: int = 3, delay: int = 1, prefix: str = "burst_"):
+    
+    camera = PiCamera()
+    camera.rotation = rotation
 
-FOLDER = "/home/pi/Pictures"
+    typer.echo("Starting camera")
+    camera.start_preview()
 
-camera.start_preview()
-sleep(3)
+    typer.echo("Warming up")
+    sleep(warmup)
 
-for i in range(20):
+    for i in range(num):
 
-    time = datetime.datetime.now().strftime("%y%m%d_%H%M%S")
-    print(time)
-    fname = f"burst_{time}_{i}.jpg"
-    fpath = join(FOLDER, fname)
-    camera.capture(fpath)
-    sleep(1)
+        time = datetime.datetime.now().strftime("%y%m%d_%H%M%S")
+        fname = f"{prefix}{time}_{i}.jpg"
+        fpath = join(out, fname)
+        typer.echo(f"Pic {i}: {fpath}")
+        camera.capture(fpath)
+        sleep(delay)
 
-camera.stop_preview()
+    typer.echo("Stopping camera")
+    camera.stop_preview()
 
+
+if __name__ == "__main__":
+    typer.run(main)
