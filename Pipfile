@@ -8,6 +8,7 @@ verify_ssl = true
 [packages]
 aiohttp = "*"
 opencv-contrib-python = "*"
+jupyter = "*"
 
 [requires]
 python_version = "3.7"
