@@ -31,10 +31,9 @@ async def take_pic(camera, out, cycles, burst, delay, prefix, warmup):
         await asyncio.sleep(delay)
 
 
-def main(out: str = ".", cycles: int = 144, burst: int = 3, delay: int = 600, prefix: str = "img_", warmup: int = 3):
-
+def main(out: str = ".", cycles: int = 144, burst: int = 3, delay: int = 600, prefix: str = "img_", warmup: int = 3, rotation: int = 0):
     with PiCamera() as camera:
-        camera.rotation = 180
+        camera.rotation = rotation
         loop = asyncio.get_event_loop()
         loop.run_until_complete(take_pic(camera, out, cycles, burst, delay, prefix, warmup))
 

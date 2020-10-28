@@ -14,7 +14,7 @@ from time import sleep
 from os.path import join
 
 
-def main(num: int = 5, out: str  = ".", rotation: int = 180, warmup: int = 3, delay: int = 1, prefix: str = "burst_"):
+def main(num: int = 5, out: str  = ".", rotation: int = 0, warmup: int = 3, delay: int = 1, prefix: str = "burst_"):
     
     with PiCamera() as camera:
         camera.rotation = rotation
