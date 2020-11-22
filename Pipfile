@@ -9,6 +9,8 @@ verify_ssl = true
 aiohttp = "*"
 opencv-contrib-python = "*"
 jupyter = "*"
+asyncssh = "*"
+typer = "*"
 
 [requires]
 python_version = "3.7"
