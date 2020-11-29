@@ -1,0 +1,151 @@
+{
+	"variables": [],
+	"info": {
+		"name": "Sonoff - BasicR3 - 1",
+		"_postman_id": "d7cd1e48-8694-b167-43c6-a44fe9d2e4f1",
+		"description": "",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "on",
+			"request": {
+				"url": "http://eWelink_1000b8fa6a.local:8081/zeroconf/switch",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"deviceid\": \"\",\n\t\"data\": {\n\t\t\"switch\": \"on\"\n\t}\n}"
+				},
+				"description": "Switch on Sonoff"
+			},
+			"response": []
+		},
+		{
+			"name": "off",
+			"request": {
+				"url": "http://eWelink_1000b8fa6a.local:8081/zeroconf/switch",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"deviceid\": \"\",\n\t\"data\": {\n\t\t\"switch\": \"off\"\n\t}\n}"
+				},
+				"description": "Switch off Sonoff"
+			},
+			"response": []
+		},
+		{
+			"name": "power-on state",
+			"request": {
+				"url": "http://eWelink_1000b8fa6a.local:8081/zeroconf/startup",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"deviceid\": \"\",\n\t\"data\": {\n\t\t\"startup\": \"off\"\n\t}\n}"
+				},
+				"description": "Set up the state of the Sonoff at startup. Possible values are \"on\", \"off\", \"stay\"."
+			},
+			"response": []
+		},
+		{
+			"name": "wifi signal strength",
+			"request": {
+				"url": "http://eWelink_1000b8fa6a.local:8081/zeroconf/signal_strength",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"deviceid\": \"\",\n\t\"data\": { }\n}"
+				},
+				"description": "Get the wifi signal strength."
+			},
+			"response": []
+		},
+		{
+			"name": "pulse",
+			"request": {
+				"url": "http://eWelink_1000b8fa6a.local:8081/zeroconf/pulse",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"deviceid\": \"\",\n\t\"data\": {\n\t\t\"pulse\": \"off\",\n\t\t\"pulseWidth\": 2000\n\t}\n}"
+				},
+				"description": "Set the Sonoff to be in pulsemode and go back off after X milliseconds."
+			},
+			"response": []
+		},
+		{
+			"name": "wifi ssid and password setting",
+			"request": {
+				"url": "http://eWelink_1000b8fa6a.local:8081/zeroconf/wifi",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"deviceid\": \"\",\n\t\"data\": {\n\t\t\"ssid\": \"maison\",\n\t\t\"password\": \"xxxxxxxx\"\n\t}\n}"
+				},
+				"description": "Change wifi/password."
+			},
+			"response": []
+		},
+		{
+			"name": "device info",
+			"request": {
+				"url": "http://eWelink_1000b8fa6a.local:8081/zeroconf/info",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"deviceid\": \"\",\n\t\"data\": { }\n}"
+				},
+				"description": "Get device info."
+			},
+			"response": []
+		}
+	]
+}
