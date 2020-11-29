@@ -4,7 +4,6 @@
 Takes a picture.
 """
 
-import sys
 import typer
 
 from datetime import datetime
@@ -12,7 +11,9 @@ from picamera import PiCamera
 from time import sleep
 from os.path import join
 
+
 def main(prefix: str = "pic_", rotation: int = 0, out: str = ".", warmup: int = 3):
+
     date = datetime.now().strftime("%y%m%d_%H%M%S")
     fname = f"{prefix}{date}.jpg"
     fpath = join(out, fname)
@@ -29,4 +30,3 @@ def main(prefix: str = "pic_", rotation: int = 0, out: str = ".", warmup: int = 
 
 if __name__ == "__main__":
     typer.run(main)
-    
